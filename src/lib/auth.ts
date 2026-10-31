@@ -25,3 +25,12 @@ export async function updatePassword(password: string) {
   const client = await getClient(); const { error } = await client.auth.updateUser({ password });
   if (error) throw new Error(error.message);
 }
+export async function requestPasswordRecovery(email: string) {
+  const client = await getClient(); const { error } = await client.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/auth/recovery` });
+  if (error) throw new Error(error.message);
+}
+export async function verifyRecoveryCode(email: string, token: string) {
+  const client = await getClient(); const { data, error } = await client.auth.verifyOtp({ email, token, type: 'recovery' });
+  if (error || !data.user) throw new Error(error?.message || 'Recovery code is invalid or expired.');
+  return mapUser(data.user);
+}

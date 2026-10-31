@@ -1,12 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 @layer base {
-  :root { --background: 45 22% 97%; --foreground: 157 18% 15%; --card: 0 0% 100%; --card-foreground: 157 18% 15%; --popover: 0 0% 100%; --popover-foreground: 157 18% 15%; --primary: 160 48% 25%; --primary-foreground: 0 0% 100%; --secondary: 150 25% 94%; --secondary-foreground: 160 40% 25%; --muted: 42 14% 95%; --muted-foreground: 150 5% 43%; --accent: 38 75% 87%; --accent-foreground: 28 52% 29%; --destructive: 0 65% 44%; --destructive-foreground: 0 0% 100%; --border: 45 14% 89%; --input: 45 14% 86%; --ring: 160 48% 25%; --radius: 1rem; --sidebar-background: 0 0% 100%; --sidebar-foreground: 157 18% 15%; --sidebar-accent: 150 25% 94%; --sidebar-accent-foreground: 160 48% 25%; --sidebar-border: 45 14% 91%; --sidebar-primary: 160 48% 25%; --sidebar-primary-foreground: 0 0% 100%; --sidebar-ring: 160 48% 25%; }
+  :root { --background: 45 22% 97%; --foreground: 157 18% 15%; --card: 0 0% 100%; --card-foreground: 157 18% 15%; --popover: 0 0% 100%; --popover-foreground: 157 18% 15%; --primary: 160 48% 25%; --primary-foreground: 0 0% 100%; --secondary: 150 25% 94%; --secondary-foreground: 160 40% 25%; --muted: 42 14% 95%; --muted-foreground: 150 8% 35%; --accent: 38 75% 87%; --accent-foreground: 28 52% 29%; --destructive: 0 65% 44%; --destructive-foreground: 0 0% 100%; --border: 45 14% 89%; --input: 45 14% 86%; --ring: 160 48% 25%; --radius: 1rem; --sidebar-background: 0 0% 100%; --sidebar-foreground: 157 18% 15%; --sidebar-accent: 150 25% 94%; --sidebar-accent-foreground: 160 48% 25%; --sidebar-border: 45 14% 91%; --sidebar-primary: 160 48% 25%; --sidebar-primary-foreground: 0 0% 100%; --sidebar-ring: 160 48% 25%; }
   * { @apply border-border; }
-  body { @apply bg-background text-foreground antialiased; font-family: 'DM Sans', sans-serif; font-size: 16px; }
-  h1,h2,h3,h4,.font-heading { font-family: 'Manrope', sans-serif; }
+  body { @apply bg-background text-foreground antialiased; font-family: 'Noto Sans Arabic', sans-serif; font-size: 16px; }
+  h1,h2,h3,h4,.font-heading { font-family: 'Manrope', 'Noto Sans Arabic', sans-serif; }
   button,a,input,textarea,select { -webkit-tap-highlight-color: transparent; }
   button,a { touch-action: manipulation; }
   button:disabled { @apply cursor-not-allowed opacity-50; }
@@ -15,7 +15,7 @@
   textarea { min-height: 120px; }
   input[type=file] { @apply text-sm; }
   input[type=checkbox] { @apply h-5 w-5 accent-primary; }
-  label { @apply block text-sm font-semibold; }
+  label { @apply block text-base font-semibold; }
   ::selection { @apply bg-secondary text-primary; }
 }
 @layer components {
@@ -36,5 +36,17 @@
   .avatar { @apply flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-bold text-primary; }
 }
 #management { scroll-margin-top: 104px; }
+html[dir=rtl] .text-left { text-align: right; }
+html[dir=rtl] .directional-icon { transform: rotate(180deg); }
+html[dir=rtl] .font-heading, html[dir=rtl] h1, html[dir=rtl] h2, html[dir=rtl] h3, html[dir=rtl] h4 { font-family: 'Noto Sans Arabic', sans-serif; letter-spacing: 0; }
+html[dir=rtl] .eyebrow { letter-spacing: 0; }
+@media print {
+  body { background: white; }
+  aside, header, footer, .certificate-actions, .certificates-page > :first-child, .certificates-page > p, .sr-only { display: none !important; }
+  .workspace-content { margin: 0 !important; }
+  .certificates-page { padding: 0; }
+  .certificates-page > .grid { display: block; }
+  .certificate-sheet { break-inside: avoid; break-after: page; border: 2px solid hsl(var(--primary)); box-shadow: none; margin: 0; padding: 32px; }
+}
 aside { scrollbar-width: thin; scrollbar-color: hsl(var(--border)) transparent; }
 @media (prefers-reduced-motion: reduce) { *,*::before,*::after { transition: none !important; animation: none !important; } }

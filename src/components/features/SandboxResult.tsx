@@ -1,0 +1,11 @@
+import { QRCodeSVG } from 'qrcode.react';
+import { CheckCircle2, CircleX, Clock3, ShieldCheck } from 'lucide-react';
+import { useLocale } from '@/hooks/useLocale';
+import { money } from '@/lib/utils';
+import type { MockPaymentResult } from '@/types/atmalis';
+interface Props { result: MockPaymentResult | null; }
+export default function SandboxResult({ result }: Props) {
+  const { t } = useLocale();
+  const Icon = result?.status === 'succeeded' ? CheckCircle2 : result?.status === 'failed' ? CircleX : Clock3;
+  return <section className="panel space-y-6 p-6 sm:p-8" aria-live="polite"><span className="badge">Mock · Atmalis</span><h2 className="section-heading">{t('Simulated payment result')}</h2>{result ? <><div className="flex items-center gap-3"><Icon size={32} className={result.status === 'failed' ? 'text-destructive' : 'text-primary'}/><div><p className="text-lg font-bold">{t(result.status === 'succeeded' ? 'Test successful' : result.status === 'failed' ? 'Test failed' : 'Test pending')}</p><p className="mt-1 text-2xl font-bold text-primary">{money(result.amount)}</p></div></div><div className="flex flex-wrap items-center gap-4"><QRCodeSVG value={result.qr_value} size={104} marginSize={3} title="Atmalis mock QR — no funds"/><div className="min-w-0 flex-1"><p className="text-sm font-semibold">{t('Reference')}</p><p dir="ltr" className="mt-2 break-all text-sm text-muted-foreground">MOCK-{result.id}</p></div></div><dl className="space-y-3 border-t pt-5"><div className="flex items-center justify-between gap-4"><dt className="text-sm text-muted-foreground">{t('Estimated platform share')} · 20%</dt><dd className="font-bold">{money(result.platform_share)}</dd></div><div className="flex items-center justify-between gap-4"><dt className="text-sm text-muted-foreground">{t('Estimated instructor share')} · 80%</dt><dd className="font-bold">{money(result.instructor_share)}</dd></div></dl></> : <p className="leading-relaxed text-muted-foreground">{t('No tests recorded yet.')}</p>}<div className="flex items-start gap-3 rounded-xl bg-secondary p-4"><ShieldCheck size={20} className="shrink-0 text-primary"/><p className="text-sm leading-relaxed text-muted-foreground">{t('No real enrollment or commission entries were created.')}</p></div></section>;
+}

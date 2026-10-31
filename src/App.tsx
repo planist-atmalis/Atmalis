@@ -3,6 +3,8 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
 import { AuthProvider } from '@/hooks/useAuth';
+import { LocaleProvider } from '@/hooks/useLocale';
+import WorkspaceLoading from '@/components/features/WorkspaceLoading';
 import SiteShell from '@/components/layout/SiteShell';
 import ScrollManager from '@/components/layout/ScrollManager';
 import ErrorBoundary from '@/components/features/ErrorBoundary';
@@ -19,9 +21,14 @@ const WorkPage = lazy(() => import('@/pages/WorkPage'));
 const SettingsPage = lazy(() => import('@/pages/SettingsPage'));
 const AuthPage = lazy(() => import('@/pages/AuthPage'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
+const RecoveryPage = lazy(() => import('@/pages/RecoveryPage'));
+const SimulatorPage = lazy(() => import('@/pages/SimulatorPage'));
+const CertificatesPage = lazy(() => import('@/pages/CertificatesPage'));
+const VerifyCertificatePage = lazy(() => import('@/pages/VerifyCertificatePage'));
+const PaymentSandboxPage = lazy(() => import('@/pages/PaymentSandboxPage'));
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: true }, mutations: { retry: false } } });
 export default function App() {
-  return <ErrorBoundary><QueryClientProvider client={queryClient}><AuthProvider><BrowserRouter><a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-xl focus:bg-primary focus:px-5 focus:py-3 focus:text-primary-foreground">Skip to main content</a><ScrollManager/><SiteShell><Suspense fallback={<div className="page-wrap"><div className="panel p-10"><p className="eyebrow mb-3">Elevate Academy</p><p className="text-lg font-semibold text-primary">Preparing your next chapter…</p></div></div>}><Routes>
+  return <ErrorBoundary><QueryClientProvider client={queryClient}><LocaleProvider><AuthProvider><BrowserRouter><a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-xl focus:bg-primary focus:px-5 focus:py-3 focus:text-primary-foreground">Skip to main content</a><ScrollManager/><SiteShell><Suspense fallback={<WorkspaceLoading/>}><Routes>
     <Route path="/" element={<OverviewPage/>}/>
     <Route path="/courses" element={<CatalogPage/>}/>
     <Route path="/courses/:id" element={<CourseDetailPage/>}/>
@@ -36,6 +43,13 @@ export default function App() {
     <Route path="/work" element={<WorkPage/>}/>
     <Route path="/settings" element={<SettingsPage/>}/>
     <Route path="/auth" element={<AuthPage/>}/>
+    <Route path="/auth/forgot-password" element={<RecoveryPage/>}/>
+    <Route path="/auth/recovery" element={<RecoveryPage/>}/>
+    <Route path="/simulator" element={<SimulatorPage/>}/>
+    <Route path="/certificates" element={<CertificatesPage/>}/>
+    <Route path="/verify" element={<VerifyCertificatePage/>}/>
+    <Route path="/verify/:serial" element={<VerifyCertificatePage/>}/>
+    <Route path="/payments/sandbox" element={<PaymentSandboxPage/>}/>
     <Route path="*" element={<NotFound/>}/>
-  </Routes></Suspense></SiteShell></BrowserRouter><Toaster position="top-right" richColors closeButton toastOptions={{ style: { background: 'hsl(var(--card))', color: 'hsl(var(--foreground))', border: '1px solid hsl(var(--border))' } }}/></AuthProvider></QueryClientProvider></ErrorBoundary>;
+  </Routes></Suspense></SiteShell></BrowserRouter><Toaster position="top-right" richColors closeButton toastOptions={{ style: { background: 'hsl(var(--card))', color: 'hsl(var(--foreground))', border: '1px solid hsl(var(--border))' } }}/></AuthProvider></LocaleProvider></QueryClientProvider></ErrorBoundary>;
 }
