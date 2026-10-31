@@ -1,0 +1,13 @@
+import { Link } from 'react-router-dom';
+import { ShieldCheck, Database, ArrowUpRight } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { ROLE_LABELS } from '@/constants/demo';
+import { initials } from '@/lib/utils';
+import PageHeading from '@/components/features/PageHeading';
+import ProfileForm from '@/components/forms/ProfileForm';
+import PasswordForm from '@/components/forms/PasswordForm';
+import EmptyState from '@/components/features/EmptyState';
+export default function SettingsPage() {
+  const { user, role } = useAuth();
+  return <div className="page-wrap"><PageHeading eyebrow="Make it yours" title="Your account. Your workspace." description="Keep your profile current and your account secure."/><div className="grid items-start gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]"><div className="space-y-6">{user ? <><ProfileForm/><PasswordForm/></> : <EmptyState title="A workspace of your own" description="Sign in to manage your profile, save your learning progress, and join the academy."><Link to="/auth" className="btn-primary">Sign in or create an account</Link></EmptyState>}</div><aside className="space-y-6"><div className="panel p-6"><span className="avatar mb-4 h-14 w-14 text-base">{initials(user?.username || 'Your account')}</span><h2 className="text-lg font-bold">{user?.username || 'Welcome to Elevate'}</h2><p className="mt-1 text-xs text-muted-foreground">{user?.email || 'Your next chapter starts here.'}</p><span className="badge mt-4"><ShieldCheck size={13}/>{user ? ROLE_LABELS[role] : 'Preview workspace'}</span><p className="mt-4 border-t pt-4 text-xs leading-relaxed text-muted-foreground">Your role is assigned securely by the academy. Students are registered automatically; instructor and employee access are managed by the administrator.</p></div><div className="rounded-2xl bg-secondary p-6"><Database size={23} className="mb-4 text-primary"/><h2 className="text-sm font-bold text-primary">First-time academy setup</h2><p className="mt-3 text-xs leading-relaxed text-muted-foreground">To initialize the first administrator, create and verify an account. In the OnSpace editor, open Cloud → Data → academy_members, find that account, and set its role to super_admin.</p><p className="mt-3 text-xs leading-relaxed text-muted-foreground">Refresh this workspace. The administrator dashboard unlocks automatically; all later roles can be managed from it.</p><Link to="/" className="mt-4 flex min-h-11 items-center justify-between text-xs font-semibold text-primary">Back to your workspace<ArrowUpRight size={16}/></Link></div></aside></div></div>;
+}

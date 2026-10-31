@@ -1,0 +1,18 @@
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { z } from 'zod';
+import { toast } from 'sonner';
+import { Plus, Save, AlertCircle, X } from 'lucide-react';
+import { lessonSchema } from '@/lib/validations';
+import { saveRow, uploadFile } from '@/lib/api';
+import type { Lesson } from '@/types/academy';
+interface Fields extends z.infer<typeof lessonSchema> { material?: FileList; }
+interface Props { courseId: string; lesson?: Lesson; position: number; close: () => void; }
+export default function LessonForm({ courseId, lesson, position, close }: Props) {
+  const cache = useQueryClient(); const form = useForm<Fields>({ resolver: zodResolver(lessonSchema.passthrough()), defaultValues: { title: '', video_url: '', position } });
+  useEffect(() => { form.reset({ title: lesson?.title || '', video_url: lesson?.video_url || '', position: lesson?.position || position }); }, [lesson, position, form]);
+  const mutation = useMutation({ mutationFn: async (values: Fields) => { const file = values.material?.[0]; const path = file ? await uploadFile('academy-materials', `course/${courseId}`, file) : lesson?.material_path || null; return saveRow('academy_lessons', { course_id: courseId, title: values.title, video_url: values.video_url || null, position: values.position, material_path: path }, lesson?.id); }, onSuccess: () => { cache.invalidateQueries({ queryKey: ['academy'] }); toast.success(lesson ? 'Lesson updated.' : 'Lesson added.'); close(); }, onError: (error: Error) => toast.error(error.message) });
+  return <form onSubmit={form.handleSubmit(values => mutation.mutate(values))} className="space-y-4 rounded-xl border bg-muted/50 p-5"><div className="flex items-center justify-between"><h3 className="font-bold">{lesson ? 'Edit lesson' : 'Add a new lesson'}</h3><button className="icon-btn" type="button" onClick={close} aria-label="Close lesson editor"><X size={17}/></button></div><div className="field"><label htmlFor="lesson-title">Lesson title</label><input id="lesson-title" {...form.register('title')} placeholder="What will learners explore?"/>{form.formState.errors.title && <p className="field-error"><AlertCircle size={14}/>{form.formState.errors.title.message}</p>}</div><div className="grid gap-4 sm:grid-cols-[1fr_110px]"><div className="field"><label htmlFor="video">HTTPS video embed URL</label><input id="video" type="url" placeholder="https://iframe.mediadelivery.net/embed/…" {...form.register('video_url')}/>{form.formState.errors.video_url && <p className="field-error"><AlertCircle size={14}/>{form.formState.errors.video_url.message}</p>}</div><div className="field"><label htmlFor="position">Lesson order</label><input id="position" type="number" min="1" {...form.register('position')}/>{form.formState.errors.position && <p className="field-error"><AlertCircle size={14}/>{form.formState.errors.position.message}</p>}</div></div><div className="field"><label htmlFor="material">Learning material (optional)</label><input id="material" type="file" accept="application/pdf,image/jpeg,image/png,image/webp" {...form.register('material')}/><p className="text-xs text-muted-foreground">PDF or image, up to 10 MB. {lesson?.material_path ? 'An existing resource is attached; choosing a file replaces it.' : 'Files are protected and accessible only to enrolled learners.'}</p></div><button className="btn-primary" disabled={mutation.isPending}>{lesson ? <Save size={16}/> : <Plus size={16}/>} {mutation.isPending ? 'Saving…' : lesson ? 'Save lesson' : 'Add lesson'}</button></form>;
+}

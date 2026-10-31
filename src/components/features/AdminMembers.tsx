@@ -1,0 +1,14 @@
+import { useState } from 'react';
+import { UserPlus, ShieldCheck } from 'lucide-react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { getClient } from '@/lib/api';
+import { initials } from '@/lib/utils';
+import { ROLE_LABELS } from '@/constants/demo';
+import type { Member, Role } from '@/types/academy';
+import InviteForm from '@/components/forms/InviteForm';
+interface Props { members: Member[]; isDemo: boolean; }
+export default function AdminMembers({ members, isDemo }: Props) {
+  const [inviting, setInviting] = useState(false); const cache = useQueryClient(); const change = useMutation({ mutationFn: async ({ id, role }: { id: string; role: Role }) => { const client = await getClient(); const { error } = await client.from('academy_members').update({ role }).eq('user_id', id); if (error) throw new Error(error.message); }, onSuccess: () => { cache.invalidateQueries({ queryKey: ['academy'] }); toast.success('Account role updated.'); }, onError: (error: Error) => toast.error(error.message) });
+  return <div><div className="flex flex-wrap items-center justify-between gap-3 p-6"><p className="flex items-center gap-2 text-xs text-muted-foreground"><ShieldCheck size={16} className="text-primary"/>Roles are enforced by database security policies.</p><button className="btn-secondary" disabled={isDemo} onClick={() => setInviting(!inviting)}><UserPlus size={16}/>Invite member</button></div>{inviting && <div className="px-6 pb-6"><InviteForm close={() => setInviting(false)}/></div>}<div className="overflow-x-auto"><table className="w-full min-w-[560px] text-left text-sm"><thead className="border-y bg-muted/50 text-[10px] uppercase tracking-wider text-muted-foreground"><tr><th className="px-6 py-4">Member</th><th className="px-6 py-4">Email</th><th className="px-6 py-4">Account role</th></tr></thead><tbody>{members.map(member => <tr key={member.user_id} className="border-b last:border-0"><td className="px-6 py-5"><div className="flex items-center gap-3"><span className="avatar">{initials(member.username || member.email)}</span><span className="font-semibold">{member.username || member.email.split('@')[0]}</span></div></td><td className="px-6 py-5 text-xs text-muted-foreground">{member.email}</td><td className="px-6 py-5"><label htmlFor={`role-${member.user_id}`} className="sr-only">Role for {member.username}</label><select id={`role-${member.user_id}`} value={member.role} className="w-auto text-xs" disabled={isDemo || change.isPending} onChange={event => change.mutate({ id: member.user_id, role: event.target.value as Role })}>{Object.entries(ROLE_LABELS).map(([role, label]) => <option key={role} value={role}>{label}</option>)}</select></td></tr>)}</tbody></table>{!members.length && <p className="p-8 text-sm text-muted-foreground">Members will appear here after they create an account.</p>}</div></div>;
+}
